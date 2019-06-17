@@ -26,6 +26,9 @@ namespace CasaDoCodigo
             // Adiciona MVC
             services.AddMvc();
 
+            services.AddDistributedMemoryCache();
+            services.AddSession();
+
             // Seta ConnectionString e adiciona DbContext do EFCore para usar o Banco de Dados
             string connectionString = Configuration.GetConnectionString("Default");
 
@@ -35,6 +38,9 @@ namespace CasaDoCodigo
 
             services.AddTransient<IDataService, DataService>();
             services.AddTransient<IProdutoRepository, ProdutoRepository>();
+            services.AddTransient<IPedidoRepository, PedidoRepository>();
+            services.AddTransient<IItemPedidoRepository, ItemPedidoRepository>();
+            services.AddTransient<ICadastroRepository, CadastroRepository>();
         }
 
         // Configuração de Pipeline - Serve para consumir os serviços
@@ -51,12 +57,13 @@ namespace CasaDoCodigo
             }
 
             app.UseStaticFiles();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Pedido}/{action=Carrossel}/{id?}");
+                    template: "{controller=Pedido}/{action=Carrossel}/{codigo?}");
             });
 
             // Cria automaticamente o Banco de Dados na execução, caso ele não exista
